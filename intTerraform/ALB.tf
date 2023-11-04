@@ -46,3 +46,4 @@ resource "aws_alb_listener" "bank_app_listener" {
 output "alb_url" {
   value = "http://${aws_alb.bank_app.dns_name}"
 }
+  
