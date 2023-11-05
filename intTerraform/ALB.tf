@@ -1,6 +1,6 @@
-#Traget Group
+# Target Group
 resource "aws_lb_target_group" "bank-app" {
-  name        = "url-app"
+  name        = "dep7-bankapp-app"
   port        = 8000
   protocol    = "HTTP"
   target_type = "ip"
@@ -14,9 +14,9 @@ resource "aws_lb_target_group" "bank-app" {
   depends_on = [aws_alb.bank_app]
 }
 
-#Application Load Balancer
+# Application Load Balancer
 resource "aws_alb" "bank_app" {
-  name               = "url-lb"
+  name               = "dep7-bankapp-lb"
   internal           = false
   load_balancer_type = "application"
 
@@ -46,4 +46,3 @@ resource "aws_alb_listener" "bank_app_listener" {
 output "alb_url" {
   value = "http://${aws_alb.bank_app.dns_name}"
 }
-  
