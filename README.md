@@ -32,13 +32,26 @@ This deployment approach leverages a range of tools and services, including GitH
 **How to do it:** Create a Dockerfile like the one below and place it in the project directory:
 
 ```Dockerfile
-# Dockerfile for the Banking Application
-FROM python:3.9
-WORKDIR /app
-COPY . /app
+FROM python:3.7
+
+RUN git clone https://github.com/kha1i1e/deployment_7.git
+
+WORKDIR deploy_7
+
+RUN pip install pip --upgrade
+
 RUN pip install -r requirements.txt
-EXPOSE 5000
-CMD ["python", "app.py"]
+
+RUN pip install mysqlclient
+
+RUN pip install gunicorn
+
+RUN python database.py
+
+EXPOSE 8000
+
+ENTRYPOINT python -m gunicorn app:app -b 0.0.0.0
+
 ```
 
 ### Step 2: Design VPC Infrastructure and CI/CD Pipeline
@@ -59,7 +72,6 @@ CMD ["python", "app.py"]
 1. Create a GitHub repository.
 2. Generate a token from GitHub.
 3. Provide the token to your Jenkins EC2 instance.
-
 
 
 
