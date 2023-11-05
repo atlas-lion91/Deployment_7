@@ -1,4 +1,5 @@
-# Deployment Documentation
+# Deploying Banking Application in Elastic Container Service (ECS)
+
 November 4, 2023
 
 By: Khalil Elkharbibi
@@ -16,6 +17,122 @@ The purpose of this documentation is to outline the steps and processes involved
 4. **Security and Reliability:** Security is paramount in any deployment. With proper configurations, we can ensure that sensitive data is protected, and the application remains reliable.
 
 5. **Scaling and Fault Tolerance:** Modern applications must be able to scale and recover from failures seamlessly. Using containerization and container orchestration, ECS provides the foundation for scalable, fault-tolerant deployments.
+
+This deployment approach leverages a range of tools and services, including GitHub for version control, Amazon RDS for database management, Docker for containerization, Terraform for infrastructure provisioning, Jenkins for automation, and ECS for container orchestration. Each step in this documentation contributes to achieving these essential DevOps goals, enabling a streamlined and secure deployment process.
+
+
+## Steps
+
+### Step 1: Create a Dockerfile
+
+**What it is:** A Dockerfile is a script that contains a set of instructions for building a Docker image. It specifies the base image, sets up the application environment, and defines how the application should run.
+
+**Why we used it:** The Dockerfile allows us to containerize the Banking Application, ensuring consistent and reproducible deployments. Docker containers are lightweight and portable, making it easy to run applications in various environments.
+
+**How to do it:** Create a Dockerfile like the one below and place it in the project directory:
+
+```Dockerfile
+# Dockerfile for the Banking Application
+FROM python:3.9
+WORKDIR /app
+COPY . /app
+RUN pip install -r requirements.txt
+EXPOSE 5000
+CMD ["python", "app.py"]
+```
+
+### Step 2: Design VPC Infrastructure and CI/CD Pipeline
+
+**What it is:** Diagram the Virtual Private Cloud (VPC) infrastructure and Continuous Integration/Continuous Deployment (CI/CD) pipeline.
+
+**Why we're doing it:** Designing your VPC infrastructure and CI/CD pipeline helps visualize and plan your deployment architecture.
+
+**How to do it:** Refer to this [AWS documentation](https://docs.aws.amazon.com/prescriptive-guidance/latest/load-balancer-stickiness/subnets-routing.html) for VPC diagram guidelines.
+
+### Step 3: GitHub/Git
+
+**What it is:** Set up a GitHub repository for Jenkins integration.
+
+**Why we're doing it:** GitHub serves as the repository from which Jenkins retrieves files to build, test, and deploy the banking application. It is essential for version control and collaboration.
+
+**How to do it:**  
+1. Create a GitHub repository.
+2. Generate a token from GitHub.
+3. Provide the token to your Jenkins EC2 instance.
+
+
+
+
+### Step 4: Amazon's Relational Database Service (RDS)
+
+**What it is:** Configure Amazon's Relational Database Service (RDS) to manage the MySQL database.
+
+**Why we're doing it:** RDS automates backups and synchronizes data across regions, availability zones, and instances. It ensures security and reliability for your database.
+
+**How to do it:** Update the Database URL in the following files: `app.py`, `database.py`, and `load_data.py` with the necessary RDS configurations.
+
+
+### Step 5: Terraform
+
+**What it is:** Use Terraform to create infrastructure for Jenkins agents, application deployment, and networking.
+
+**Why we're doing it:** Terraform enables automated provisioning and management of resources, ensuring infrastructure consistency and scalability.
+
+**How to do it:**  
+1. Create Terraform scripts for Jenkins agent infrastructure, networking, and the application.
+2. Deploy the infrastructure using Terraform.
+
+### Step 6: Jenkins
+
+**What it is:** Automate the build, test, and deployment of the Banking Application using Jenkins.
+
+**Why we're doing it:** Jenkins automates the software development process and ensures that the application is built, tested, and deployed efficiently.
+
+**How to do it:**  
+1. Set up Jenkins and Jenkins nodes.
+2. Create a Key Pair.
+3. Configure Jenkins.
+4. Configure Jenkins nodes, AWS access keys, Docker credentials, and install necessary plugins.
+
+### Step 7: Use Jenkins Terraform Agent
+
+**What it is:** Execute Terraform scripts using Jenkins to create the Banking Application infrastructure and deploy the application on ECS with Application Load Balancer.
+
+**Why we're doing it:** Jenkins simplifies the deployment process by executing Terraform scripts to create infrastructure and deploy the application.
+
+**How to do it:**  
+1. Create a Jenkins build named "Deployment_7".
+2. Run the Jenkinsfile from the GitHub Repository: https://github.com/kha1i1e/deployment_7.git.
+
+### Step 8: Application Load Balancer (ALB)
+
+**What it is:** Create an Application Load Balancer to distribute incoming web traffic to application instances.
+
+**Why we're doing it:** The ALB ensures the application remains available, responsive, and efficient by distributing traffic evenly and redirecting it in case of server issues.
+
+**How to do it:**  
+Refer to the provided Terraform code for creating an ALB.
+
+### Step 9: Main Infrastructure (main.tf)
+
+**What it is:** Define the main infrastructure using Terraform, including the ECS cluster, task definition, and ECS service.
+
+**Why we're doing it:** Terraform helps define the desired state of your infrastructure and manage the resources to match that configuration, ensuring scalability and consistency.
+
+**How to do it:**  
+Refer to the provided Terraform code (main.tf) to define and deploy the main infrastructure.
+
+### Conclusion
+
+**Why we used ECS:** We used ECS for its ability to simplify containerized application deployment and management.
+
+**Why we used RDS:** RDS automates database management, ensuring data synchronization, security, and reliability.
+
+**Why we used Terraform:** Terraform enables automation, scalability, and consistency in managing infrastructure resources.
+
+**Why we used Jenkins:** Jenkins automates the software development process, including building, testing, and deploying applications.
+
+This comprehensive documentation provides a step-by-step guide to deploying your banking application in an efficient and scalable manner. Use the provided code snippets and instructions to facilitate a smooth deployment process.
 
 This deployment approach leverages a range of tools and services, including GitHub for version control, Amazon RDS for database management, Docker for containerization, Terraform for infrastructure provisioning, Jenkins for automation, and ECS for container orchestration. Each step in this documentation contributes to achieving these essential DevOps goals, enabling a streamlined and secure deployment process.
 
