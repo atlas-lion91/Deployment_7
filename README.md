@@ -5,13 +5,9 @@ November 4, 2023
 By: Khalil Elkharbibi
 
 
-## Introduction
-
-This document serves as a comprehensive guide for deploying a containerized banking application using Amazon Web Services (AWS) Elastic Container Service (ECS). It details the purpose, prerequisites, and a step-by-step procedure that includes best practices and common issues encountered with their resolutions. 
-
 ## Purpose
 
-The purpose of this documentation is to outline the steps and processes involved in deploying a Banking Application in Elastic Container Service (ECS) using various DevOps tools and technologies. In modern software development, efficient and automated deployment processes are essential for several reasons:
+The goal of this deployment is to launch a banking application using Amazon's Elastic Container Service (ECS). The previous setup involved a Jenkins agent applying Terraform .tf files to create infrastructure across four public subnets with a synchronized RDS for database consistency. This deployment enhances the existing structure by integrating Docker within ECS for an automated, scalable, and reliable application service delivery. In modern software development, efficient and automated deployment processes are essential for several reasons:
 
 1. **Agility and Rapid Development:** Rapid application development is a cornerstone of today's software industry. An efficient deployment process allows developers to focus on writing code while the automated pipeline takes care of building, testing, and deploying the application.
 
