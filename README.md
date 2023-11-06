@@ -58,24 +58,143 @@ ENTRYPOINT python -m gunicorn app:app -b 0.0.0.0
 **Why we used it:** Properly naming and configuring resources in Terraform ensures clarity and consistency. The main.tf file is critical for setting up the infrastructure, while ALB.tf deals with configuring the Application Load Balancer, which is essential for directing traffic to our ECS instances.
 
 ```
-# main.tf
-resource "aws_instance" "jenkins_manager" {
-  ami           = "ami-0123456789"
-  instance_type = "t2.micro"
-  tags = {
-    Name = "jenkins-manager"
-  }
-  # ... other configurations
+provider "aws" {
+  access_key = var.aws_access_key
+  secret_key = var.aws_secret_key
+  region     = "us-east-1"
+
 }
+
+# Cluster
+resource "aws_ecs_cluster" "aws-ecs-cluster" {
+  name = "urlapp-cluster"
+  tags = {
+    Name = "url-ecs"
+  }
+}
+
+resource "aws_cloudwatch_log_group" "log-group" {
+  name = "/ecs/bank-logs"
+
+  tags = {
+    Application = "bank-app"
+  }
+}
+
+# Task Definition
+
+resource "aws_ecs_task_definition" "aws-ecs-task" {
+  family = "url-task"
+
+  container_definitions = <<EOF
+  [
+  {
+      "name": "url-container",
+      "image": "tsanderson77/bankapp11:latest",
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/bank-logs",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "portMappings": [
+        {
+          "containerPort": 5000
+        }
+      ]
+    }
+  ]
+  EOF
+
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  memory                   = "1024"
+  cpu                      = "512"
+  execution_role_arn       = "arn:aws:iam::156156311593:role/ecsTaskExecutionRole"
+  task_role_arn            = "arn:aws:iam::156156311593:role/ecsTaskExecutionRole"
+
+}
+
+# ECS Service
+resource "aws_ecs_service" "aws-ecs-service" {
+  name                 = "url-ecs-service"
+  cluster              = aws_ecs_cluster.aws-ecs-cluster.id
+  task_definition      = aws_ecs_task_definition.aws-ecs-task.arn
+  launch_type          = "FARGATE"
+  scheduling_strategy  = "REPLICA"
+  desired_count        = 2
+  force_new_deployment = true
+
+  network_configuration {
+    subnets = [
+      aws_subnet.private_a.id,
+      aws_subnet.private_b.id
+    ]
+    assign_public_ip = false
+    security_groups  = [aws_security_group.ingress_app.id]
+  }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.bank-app.arn
+    container_name   = "url-container"
+    container_port   = 5000
+  }
+
+}
+
+    
 ```
 
 ```
-# ALB.tf
-resource "aws_lb_target_group" "bank_app" {
-  name        = "bank-app-target-group"
-  port        = 5000
+# Target Group
+resource "aws_lb_target_group" "bank-app" {
+  name        = "dep7-bankapp-app"
+  port        = 8000
   protocol    = "HTTP"
-  vpc_id      = aws_vpc.main.id
+  target_type = "ip"
+  vpc_id      = aws_vpc.app_vpc.id
+
+  health_check {
+    enabled = true
+    path    = "/health"
+  }
+
+  depends_on = [aws_alb.bank_app]
+}
+
+# Application Load Balancer
+resource "aws_alb" "bank_app" {
+  name               = "dep7-bankapp-lb"
+  internal           = false
+  load_balancer_type = "application"
+
+  subnets = [
+    aws_subnet.public_a.id,
+    aws_subnet.public_b.id,
+  ]
+
+  security_groups = [
+    aws_security_group.http.id,
+  ]
+
+  depends_on = [aws_internet_gateway.igw]
+}
+
+resource "aws_alb_listener" "bank_app_listener" {
+  load_balancer_arn = aws_alb.bank_app.arn
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.bank-app.arn
+  }
+}
+
+output "alb_url" {
+  value = "http://${aws_alb.bank_app.dns_name}"
 }
 ```
 
@@ -86,14 +205,68 @@ resource "aws_lb_target_group" "bank_app" {
 **Why we used it:** Terraform ensures that our Jenkins infrastructure is created consistently and can be easily scaled. By defining infrastructure as code, we can manage our Jenkins servers and agents efficiently.
 
 ```
-# Jenkins.tf
-resource "aws_instance" "jenkins_manager" {
-  ami           = "ami-0123456789"
-  instance_type = "t2.micro"
+################################### A W S #################################
+
+provider "aws" {
+  access_key = var.access_key  #enter your aws access_key
+  secret_key = var.secret_key  #enter your aws secret_key
+  region = var.region   #Availability Zone
+  #profile = "Admin"
+}
+
+################################### I N S T A N C E # 1 #################################
+
+resource "aws_instance" "tf_local_instance_1" {
+  ami = var.ami                            
+  instance_type = var.instance_type
+  subnet_id = var.instance_1_attach_existing_subnet 
+  vpc_security_group_ids = var.instance_1_existing_sg #[aws_security_group.tf_local_security_group_1.id]  #new sg and exiting
+  user_data = "${file(var.instance_1_installs)}"
+  key_name = var.key_pair          
+  associate_public_ip_address = true  
+
   tags = {
-    Name = "jenkins-manager"
+    "Name" : var.aws_instance_1_name     
   }
-  # ... other configurations
+}
+
+################################### I N S T A N C E # 2 #################################
+
+resource "aws_instance" "tf_local_instance_2" {
+  ami = var.ami                            #AMI ID for Ubuntu
+  instance_type = var.instance_type
+  subnet_id = var.instance_2_attach_existing_subnet
+  
+  #security_groups = var.instance_1_existing_sg   
+  vpc_security_group_ids = var.instance_1_existing_sg #[aws_security_group.tf_local_security_group_2.id]   
+  user_data = "${file(var.instance_1_installs)}"
+  key_name = var.key_pair          # name of your SSH key pair
+  associate_public_ip_address = true  # Enable Auto-assign public IP
+
+  tags = {
+    "Name" : var.aws_instance_2_name   #name of the instance in AWS
+  }
+}
+
+################################### I N S T A N C E # 3 #################################
+
+resource "aws_instance" "tf_local_instance_3" {
+  ami = var.ami                         
+  instance_type = var.instance_type
+  subnet_id = var.instance_3_attach_existing_subnet
+  vpc_security_group_ids = var.instance_1_existing_sg #[aws_security_group.tf_local_security_group_2.id]   
+  user_data = "${file(var.instance_1_installs)}"
+  key_name = var.key_pair          # name of your SSH key pair
+  associate_public_ip_address = true  # Enable Auto-assign public IP
+
+  tags = {
+    "Name" : var.aws_instance_3_name   #name of the instance in AWS
+  }
+}
+################################### O U T P U T #################################
+
+output "instance_1_ip" {            
+  value = aws_instance.tf_local_instance_1.public_ip
 }
 ```
 
@@ -105,8 +278,8 @@ resource "aws_instance" "jenkins_manager" {
 
 ```
 # VPC.tf
-resource "aws_vpc" "main" {
-  cidr_block = "10.0.0.0/16"
+resource "aws_vpc" "app_vpc" {
+  cidr_block = "172.28.0.0/16"
   enable_dns_support = true
   enable_dns_hostnames = true
   tags = {
@@ -114,6 +287,7 @@ resource "aws_vpc" "main" {
   }
   # ... other configurations
 }
+
 ```
 
 ### Step 5: Create an RDS Database
@@ -132,14 +306,24 @@ resource "aws_db_instance" "bank_app_db" {
   instance_class       = "db.t2.micro"
   name                 = "bankingdb"
   username             = "admin"
-  password             = "securepassword"
+  password             = ""
   parameter_group_name = "default.mysql5.7"
   skip_final_snapshot  = true
   tags = {
     Name = "bank-app-db"
   }
-  # ... other configurations
 }
+```
+
+```
+# git update datapoints
+git clone https://github.com/kha1i1e/Deployment_7.git
+cd Deployment_7/
+git init
+git branch second
+git switch second
+# Update Database_URL in app.py, database.py, and load_data.py
+git commit -a
 ```
 
 ### Step 6: Create a Docker Image
@@ -148,15 +332,53 @@ resource "aws_db_instance" "bank_app_db" {
 
 **Why we used it:** Creating a Docker image allows us to package the Banking Application along with its dependencies, ensuring consistency across different environments. It simplifies deployment and enhances scalability.
 
+```
+# GIT - docker file
+
+# Update dockerfile
+git commit -a # added comment
+# Test the docker file
+# Build the image
+docker build -t bankapp
+# Create the container and deploy the application
+docker container run -p 80:8000 bankapp
+# Retag an image to include the Docker Hub account name
+docker tag bankapp kha1i1e/banking
+# Login into Docker Hub on your terminal
+docker login # enter credentials
+# Push the image to Docker Hub
+docker push kha1i1e/bankapp
+# Delete image from Docker Hub
+```
+
+
 ### Step 7: Create Jenkins Manager and Agents
 
 **What it is:** Jenkins is an open-source automation server that helps automate various parts of the software development process, including building, testing, and deploying applications.
 
 **Why we used it:** Jenkins is crucial for automating the build, test, and deployment processes. The Jenkins Manager and Agents infrastructure ensures that tasks are distributed efficiently, and the pipeline runs smoothly.
 
-### Step 8: Create
+```
+#Jenkins-Agent Infrastructure
 
- an ECS Cluster
+git add jenkinsTerraform
+# Create files main.tf, terraform.tfvars, variables.tf, installfile1.sh, installfile2.sh, installs3.sh
+terraform init
+terraform validate
+terraform plan
+terraform apply
+# After creation of the Jenkins Agent infrastructure
+git add main.tf terraform.tfvars variables.tf installfile1.sh installfile2.sh installs3.sh
+git commit -a
+# Make a file .gitignore and put all the names of the files for Git to ignore
+git push --set-upstream origin second
+git switch main
+git merge second
+git push --all
+```
+
+
+### Step 8: Create an ECS Cluster
 
 **What it is:** Amazon Elastic Container Service (ECS) is a managed container orchestration service that simplifies the deployment, management, and scaling of containerized applications.
 
@@ -167,6 +389,7 @@ resource "aws_db_instance" "bank_app_db" {
 **What it is:** This step involves deploying the Banking Application containers to the ECS cluster created in the previous step.
 
 **Why we used it:** Deploying to ECS is a scalable and reliable approach. ECS manages the deployment of containers, ensuring they are highly available and can be easily scaled based on demand.
+
 
 ### Step 10: Set Up an Application Load Balancer (ALB)
 
@@ -191,6 +414,11 @@ resource "aws_db_instance" "bank_app_db" {
 **What it is:** Jenkins is used to execute Terraform scripts to create the Banking Application infrastructure and deploy the application on ECS with an Application Load Balancer.
 
 **Why we used it:** Jenkins orchestrates the deployment pipeline. In this step, it executes Terraform scripts, automating the provisioning and deployment of infrastructure.
+
+**Successfully Deployment Banking Application**:
+![Deployment_7 banking app deployed](https://github.com/kha1i1e/Deployment_7/assets/140761974/f76f3e47-34b1-46c7-82f2-5ea9d86f6d98)
+
+
 
 ### Step 14: Monitor and Troubleshoot
 
