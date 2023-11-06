@@ -32,6 +32,32 @@ This deployment approach leverages a range of tools and services, including GitH
 - A GitHub account and repository for the banking application source code and Dockerfiles.
 - A configured CI/CD environment with Jenkins installed and Docker and Terraform ready for use.
 
+**GitHub for Version Control**
+- **What**: GitHub is a web-based platform for version control using Git. It allows multiple developers to collaborate on a codebase, track changes, and manage the software development process.
+- **Why**: GitHub is widely used for version control because it provides a centralized location for code, making it easy for teams to collaborate. It also offers a range of features like pull requests, code reviews, and issue tracking that enhance the development process.
+
+**Amazon RDS for Database Management**
+- **What**: Amazon RDS (Relational Database Service) is a managed database service by AWS. It supports multiple database engines, including MySQL, and simplifies database administration tasks such as provisioning, patching, backup, recovery, and scaling.
+- **Why**: Amazon RDS is chosen for its ease of management, automated backups, and scalability. It ensures that the database is reliable and secure, with high availability options.
+
+**Docker for Containerization**
+- **What**: Docker is a platform for developing, shipping, and running applications in containers. Containers package an application and its dependencies into a single unit for consistent deployment.
+- **Why**: Docker simplifies the deployment process by packaging the application and its dependencies, ensuring that it runs consistently across different environments. It is lightweight, efficient, and allows for efficient scaling of applications.
+
+**Terraform for Infrastructure Provisioning**
+- **What**: Terraform is an open-source infrastructure-as-code tool. It enables users to define and provision infrastructure using a declarative configuration language.
+- **Why**: Terraform allows for infrastructure provisioning in a consistent and automated manner. It ensures that the infrastructure is versioned, reproducible, and can be scaled as needed.
+
+**Jenkins for Automation**
+- **What**: Jenkins is an open-source automation server that helps automate various parts of the software development process, including building, testing, and deploying code.
+- **Why**: Jenkins streamlines the CI/CD process by automating tasks, like building Docker images, running tests, and deploying to ECS. It ensures reliability, consistency, and rapid development.
+
+**ECS for Container Orchestration**
+- **What**: Amazon Elastic Container Service (ECS) is a fully managed container orchestration service that simplifies the deployment, management, and scaling of containerized applications using Docker containers.
+- **Why**: ECS is chosen for its ability to manage and scale Docker containers seamlessly. It ensures high availability and fault tolerance while simplifying the deployment and management of containers.
+
+These technologies were selected to streamline the deployment process, ensuring agility, security, and scalability while maintaining consistency and predictability in the development and deployment of the containerized banking application.
+
 ## System Diagram
 
 
