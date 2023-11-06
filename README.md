@@ -422,7 +422,8 @@ Potential optimizations include:
 > - Auto-scaling ECS tasks based on load for cost-effective performance.
 > - Utilizing AWS Spot Instances for non-critical parts of the CI/CD pipeline to reduce costs.
 
-Conclusion
+## Conclusion
+
 The infrastructure implemented for the banking application is secure to an extent, as critical components reside in private subnets, reducing direct exposure to potential attacks. The deployment ensures fault tolerance by leveraging ECS's capability to replace failed containers automatically. In the event of an instance termination, the impact on the application's availability is mitigated by container orchestration in ECS, confirming the resilience of the infrastructure. However, it's noted that all components are in the same region, posing a risk if a regional outage occurs. The containers are deployed within private subnets of the us-east-1a and us-east-1b availability zones, managing ingress and egress through ALB settings for controlled access.
 
 By addressing the stated issues and incorporating suggested optimizations, the infrastructure's reliability, performance, and security will be enhanced for the banking application deployment.
