@@ -296,6 +296,9 @@ resource "aws_vpc" "app_vpc" {
 
 **Why we used it:** An RDS database provides a reliable and scalable data store for our application. It offers automated backups, data synchronization across regions, and high security standards. Our Banking Application relies on this database for data integrity and availability.
 
+
+![DB Endpoint](https://github.com/kha1i1e/Deployment_7/assets/140761974/8ecb8bb6-1a71-4a15-b2c2-5c21db808b27)
+
 ```
 # RDS.tf
 resource "aws_db_instance" "bank_app_db" {
@@ -326,6 +329,7 @@ git switch second
 git commit -a
 ```
 
+
 ### Step 6: Create a Docker Image
 
 **What it is:** A Docker image is a template of an application with all the dependencies it needs to run. A Dockerfile contains instructions to build this image.
@@ -333,9 +337,8 @@ git commit -a
 **Why we used it:** Creating a Docker image allows us to package the Banking Application along with its dependencies, ensuring consistency across different environments. It simplifies deployment and enhances scalability.
 
 ```
-# GIT - docker file
+# docker file
 
-# Update dockerfile
 git commit -a # added comment
 # Test the docker file
 # Build the image
@@ -384,11 +387,18 @@ git push --all
 
 **Why we used it:** ECS enables us to run containers in a scalable and reliable manner. It automates container management, making it easier to deploy applications. The ECS cluster serves as the foundation for hosting our application containers.
 
+![Deployment7 ecstaskexecution](https://github.com/kha1i1e/Deployment_7/assets/140761974/2010234a-d79c-45f5-8e9b-7cd6812e593a)
+
+![Deployment 7 ecs](https://github.com/kha1i1e/Deployment_7/assets/140761974/65fb23c1-6e2d-469d-a5c6-5a6a30923020)
+
 ### Step 9: Deploy the Banking Application to ECS
 
 **What it is:** This step involves deploying the Banking Application containers to the ECS cluster created in the previous step.
 
 **Why we used it:** Deploying to ECS is a scalable and reliable approach. ECS manages the deployment of containers, ensuring they are highly available and can be easily scaled based on demand.
+
+**Successfully Deployment Banking Application**:
+![Deployment_7 banking app deployed](https://github.com/kha1i1e/Deployment_7/assets/140761974/f76f3e47-34b1-46c7-82f2-5ea9d86f6d98)
 
 
 ### Step 10: Set Up an Application Load Balancer (ALB)
@@ -397,11 +407,14 @@ git push --all
 
 **Why we used it:** The ALB helps manage traffic efficiently. It distributes incoming requests to available instances, avoiding overloads and ensuring continuous availability.
 
+![Deployment 7 load balancer](https://github.com/kha1i1e/Deployment_7/assets/140761974/eb257898-18eb-49a5-9faf-9db8b2f36afb)
+
 ### Step 11: Set Up Jenkins for Automation
 
 **What it is:** Jenkins automates the build, test, and deployment of the Banking Application. It requires the proper installation of Jenkins, Java, and necessary plugins.
 
 **Why we used it:** Jenkins simplifies the automation of DevOps processes. It orchestrates the deployment pipeline, ensuring that the application is built, tested, and deployed consistently.
+
 
 ### Step 12: Configure Jenkins for the Pipeline
 
@@ -409,26 +422,28 @@ git push --all
 
 **Why we used it:** Proper Jenkins configuration ensures that the pipeline operates smoothly. Access keys, credentials, and node settings are essential for automating tasks within the deployment process.
 
+
+
 ### Step 13: Use Jenkins for Terraform Script Execution
 
 **What it is:** Jenkins is used to execute Terraform scripts to create the Banking Application infrastructure and deploy the application on ECS with an Application Load Balancer.
 
 **Why we used it:** Jenkins orchestrates the deployment pipeline. In this step, it executes Terraform scripts, automating the provisioning and deployment of infrastructure.
 
-**Successfully Deployment Banking Application**:
-![Deployment_7 banking app deployed](https://github.com/kha1i1e/Deployment_7/assets/140761974/f76f3e47-34b1-46c7-82f2-5ea9d86f6d98)
+
+![Deployment 7 Jenkins](https://github.com/kha1i1e/Deployment_7/assets/140761974/891f7dd6-7940-425c-aa14-e70579606877)
 
 
 
 ### Step 14: Monitor and Troubleshoot
 
-This step involves monitoring the deployed infrastructure, logs, and application performance. It allows for troubleshooting and optimization.
+- This step involves monitoring the deployed infrastructure, logs, and application performance. It allows for troubleshooting and optimization.
 
-Monitoring ensures that the infrastructure remains secure and performs well. It helps identify and resolve issues promptly.
+- Monitoring ensures that the infrastructure remains secure and performs well. It helps identify and resolve issues promptly.
 
 ### Step 15: Enhance for Optimization
 
-This step involves optimizing the deployment process. Possible enhancements include improving automation, enhancing security, and adding content delivery network (CDN) for static content.
+- Possible enhancements include improving automation, enhancing security, and adding content delivery network (CDN) for static content.
 
- Optimization is an ongoing process. Enhancing automation and security while adding a CDN can further improve deployment efficiency and the application's performance.
+- Optimization is an ongoing process. Enhancing automation and security while adding a CDN can further improve deployment efficiency and the application's performance.
 
