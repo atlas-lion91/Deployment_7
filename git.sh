@@ -26,10 +26,8 @@ docker push kha1i1e/bankapp
 # Delete image from Docker Hub
 
 # GIT - Jenkins-Agent Infrastructure
-
-# Make a new directory jenkinsTerraform
 git add jenkinsTerraform
-# Create files main.tf, terraform.tfvars, variables.tf, installfile1.sh, installfile2.sh, installs3.sh
+# Create files main.tf, terraform.tfvars, variables.tf, installfile1.sh, installfile2.sh, installfile3.sh
 terraform init
 terraform validate
 terraform plan
