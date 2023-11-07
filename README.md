@@ -55,6 +55,7 @@ This deployment approach leverages a range of tools and services, including GitH
 These technologies were selected to streamline the deployment process, ensuring agility, security, and scalability while maintaining consistency and predictability in the development and deployment of the containerized banking application.
 
 ## System Diagram
+![Deployment 7 drawio](https://github.com/kha1i1e/Deployment_7/assets/140761974/c708a5e8-71dc-40fc-b8bf-33023bc71317)
 
 
 ## Steps
